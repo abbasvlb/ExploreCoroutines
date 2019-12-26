@@ -3,12 +3,9 @@ package com.ivy.android.explorecoroutines
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,11 +33,22 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun fakeApiRequest() {
 
-        val string = getResult1FromApi()
-        setTextOnMainThread(string)
+        withContext(IO){
+            val job = withTimeoutOrNull(1900L) {
+                val string = getResult1FromApi()
+                setTextOnMainThread(string)
 
-        val string2 = getResult2FromApi()
-        setTextOnMainThread(string2)
+                val string2 = getResult2FromApi()
+                setTextOnMainThread(string2)
+            }
+
+            if (job==null){
+                setTextOnMainThread("Too long : Time out")
+            }
+
+
+        }
+
 
     }
 
